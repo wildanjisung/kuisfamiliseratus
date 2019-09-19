@@ -278,6 +278,26 @@
                 </v-list>
               </v-card>
 
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center h1 headline">Total</v-subheader>
+                  <v-list-item-group v-model="selectedListBabak" color="primary">
+                    <v-list-item >
+                      <v-layout wrap>
+                        <v-list-item-content class="text-center">
+                          <v-list-item-title v-text="totalTeam2" class="font-weight-black display-1"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+
             </v-flex>
 
           </v-layout>
@@ -779,10 +799,10 @@
             console.log("not push"); // jawaban benar
 
             if (this.modeSapuBersih) {
-              this.score[turn] = this.countScore(this.soal[0]["team1"]) + this.countScore(this.soal[0]["team2"])
+              this.score[turn] = this.countScore(this.soal[0][turn]) + this.countScore(this.soal[0][notTurn])
               this.score[notTurn] = 0
             } else {
-              this.score[turn] = this.countScore(this.soal[0]["team1"])
+              this.score[turn] = this.countScore(this.soal[0][turn])
             }
 
             let sound = new Howl({
