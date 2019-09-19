@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <!-- <link href="http://127.0.0.1:5500/assets/font.css" rel="stylesheet"> -->
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <!-- <link href="http://127.0.0.1:5500/assets/materialdesignicons.min.css" rel="stylesheet"> -->
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <!-- <link href="http://127.0.0.1:5500/assets/vuetify.min.css" rel="stylesheet"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <!-- <button type="button" onclick="test()">test</button> -->
+  <div id="app">
+    <v-app>
+      <v-content>
+        <v-container>
+
+          <v-form>
+            <v-container>
+              <v-row>
+        
+                <v-col cols="12" sm="5" class="d-flex align-center">
+                  
+                  <v-text-field
+                    v-model="answer"
+                    label="Jawaban"
+                    outlined
+                  ></v-text-field>
+                </v-col>
+
+                <v-col cols="12" sm="1" class="d-flex align-center">
+                  <v-btn v-on:click="submitAnswer" color="primary" fab small dark>
+                    <v-icon>mdi-mouse</v-icon>
+                  </v-btn>
+                </v-col>
+
+                <v-col cols="12" sm="2" class="d-flex align-center">
+                  <v-radio-group v-model="turn" row>
+                    <v-radio label="Team 1" value="team1"></v-radio>
+                    <v-radio label="Team 2" value="team2"></v-radio>
+                  </v-radio-group>
+                </v-col>
+                
+                <v-col cols="12" sm="2" class="d-flex align-center">
+                  <v-select
+                    :items="selectSoal"
+                    label="Soal"
+                    outlined
+                    @change="changeSoal"
+                  ></v-select>
+                </v-col>
+
+                <v-col cols=12 sm="2" class="d-flex align-center">
+                      <v-checkbox v-model="modeSapuBersih" label="mode Sapu Bersih"></v-checkbox>
+                      <v-btn v-on:click="saveScore" color="primary" fab small dark>
+                        <v-icon>mdi-content-save</v-icon>
+                      </v-btn>
+                      <!-- <v-checkbox v-model="modeGantiSoal" label="Ganti Soal"></v-checkbox> -->
+                </v-col>
+                
+                <!-- <p>{{answer}}</p> -->
+        
+              </v-row>
+            </v-container>
+          </v-form>
+
+          <v-layout row wrap>
+
+            <v-flex xs3>
+              <v-card
+                xs3
+                min-height="300"
+                class="d-flex align-center mx-auto justify-center"
+                outlined
+              >
+                <div class="display-4 font-weight-black">{{score.team1}}</div>
+              </v-card>
+
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center h1 headline">Score Per Babak</v-subheader>
+                  <v-list-item-group v-model="selectedListBabak" color="primary">
+                    <v-list-item
+                      v-for="(item, i) in scorePerBabak"
+                      :key="i"
+                      class="grey lighten-3"
+                    >
+                      <v-layout wrap>
+                        <v-list-item-content class="text-center">
+                          <v-list-item-title v-text="item.babak" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-content class="text-center">
+                          <v-list-item-title v-text="item.team1" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+
+              <hr>
+
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center h1 headline">Total</v-subheader>
+                  <v-list-item-group v-model="selectedListBabak" color="primary">
+                    <v-list-item >
+                      <v-layout wrap>
+                        <v-list-item-content class="text-center">
+                          <v-list-item-title v-text="totalTeam1" class="font-weight-black display-1"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+
+            </v-flex>
+
+            <v-flex xs3>
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center display-1">TEAM 1</v-subheader>
+                  <v-list-item-group v-model="item" color="primary">
+                    <v-list-item
+                      v-for="(item, i) in soal[0].team1"
+                      :key="i"
+                      class="grey lighten-3"
+                      @click="showAnswer(item, i)"
+                    >
+                      <v-layout v-show="item.show" wrap>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.score" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.text" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center display-1">Jawaban Salah</v-subheader>
+                  <v-list-item-group v-model="item" color="primary">
+                    <v-list-item
+                      v-for="(item, i) in soalFalse[0].team1"
+                      :key="i"
+                      class="red lighten-3"
+                    >
+                      <v-layout v-show="item.show" wrap >
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.score" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.text" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+            </v-flex>
+
+            <v-flex xs3>
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center display-1">TEAM 2</v-subheader>
+                  <v-list-item-group v-model="item" color="primary">
+                    <v-list-item
+                      v-for="(item, i) in soal[0].team2"
+                      :key="i"
+                      class="grey lighten-3"
+                      @click="showAnswer(item, i)"
+                    >
+                      <v-layout v-show="item.show" wrap >
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.score" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.text" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center display-1">Jawaban Salah</v-subheader>
+                  <v-list-item-group v-model="item" color="primary">
+                    <v-list-item
+                      v-for="(item, i) in soalFalse[0].team2"
+                      :key="i"
+                      class="red lighten-3"
+                    >
+                      <v-layout v-show="item.show" wrap >
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.score" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.text" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+            </v-flex>
+
+            <v-flex xs3>
+              <v-card
+                xs3
+                min-height="300"
+                class="d-flex align-center mx-auto justify-center"
+                outlined
+              >
+                <div class="display-4 font-weight-black">{{score.team2}}</div>
+              </v-card>
+
+              <v-card
+                class="mx-auto"
+                max-width="300"
+                tile
+                flat
+              >
+                <v-list rounded>
+                  <v-subheader class="d-flex justify-center h1 headline">Score Per Babak</v-subheader>
+                  <v-list-item-group v-model="selectedListBabak" color="primary">
+                    <v-list-item
+                      v-for="(item, i) in scorePerBabak"
+                      :key="i"
+                      class="grey lighten-3"
+                    >
+                      <v-layout wrap>
+                        <v-list-item-content class="text-center">
+                          <v-list-item-title v-text="item.babak" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-content class="text-center">
+                          <v-list-item-title v-text="item.team2" class="font-weight-black"></v-list-item-title>
+                        </v-list-item-content>
+                      </v-layout>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-card>
+
+            </v-flex>
+
+          </v-layout>
+
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.2/howler.min.js"></script>
+  <!-- <script src="http://127.0.0.1:5500/assets/howler.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <!-- <script src="http://127.0.0.1:5500/assets/vue.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <!-- <script src="http://127.0.0.1:5500/assets/vuetify.js"></script> -->
+  <script>
+    vm = new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: () => ({
+        // ANCHOR data
+        selectSoal: [
+          {text: "Soal 1", value: "0"},
+          {text: "Soal 2", value: "1"},
+          {text: "Soal 3", value: "2"},
+          {text: "Soal 4", value: "3"},
+          {text: "Soal 5", value: "4"},
+          {text: "Soal 6", value: "5"},
+          {text: "Soal 7", value: "6"},
+          {text: "Soal 8", value: "7"},
+          {text: "Soal 9", value: "8"},
+          {text: "Soal 10", value: "9"},
+          {text: "Soal 11", value: "10"},
+          {text: "Soal 12", value: "11"},
+          {text: "Soal 13", value: "12"},
+          {text: "Soal 14", value: "13"},
+          {text: "Soal 15", value: "14"},
+        ],
+
+        scorePerBabak: [
+          {babak: "Babak 1", team1:0, team2:0},
+          {babak: "Babak 2", team1:0, team2:0},
+          {babak: "Babak 3", team1:0, team2:0},
+          {babak: "Babak 4", team1:0, team2:0},
+          {babak: "Babak 5", team1:0, team2:0},
+          {babak: "Babak 6", team1:0, team2:0},
+          {babak: "Babak 7", team1:0, team2:0},
+          {babak: "Babak 8", team1:0, team2:0},
+          {babak: "Babak 9", team1:0, team2:0},
+          {babak: "Babak 10", team1:0, team2:0},
+          {babak: "Babak 11", team1:0, team2:0},
+          {babak: "Babak 12", team1:0, team2:0},
+          {babak: "Babak 13", team1:0, team2:0},
+          {babak: "Babak 14", team1:0, team2:0},
+          {babak: "Babak 15", team1:0, team2:0},
+        ],
+        modeSapuBersih: false,
+        modeGantiSoal: -1,
+
+        /* isActive: false,
+        classFalse: 'red--text',
+        classCorrect: 'blue--text',
+
+        activeClass: 'red--text',
+        errorClass: 'blue--text', */
+
+        turn: null,
+
+        answer: "",
+        item: -1,
+        selectedListBabak: -1,
+        soalFalse: [
+          {
+            team1: []
+          },
+          {
+            team2: []
+          }
+        ],
+        bankSoal: [
+          {
+            team1: [
+              { id: 1, text: 'ga liat', score: 100, show: false, calc: false },
+              { id: 2, text: 'ngantuk', score: 90, show: false, calc: false },
+              { id: 3, text: 'tergelincir', score: 80, show: false, calc: false },
+              { id: 4, text: 'kucing lewat', score: 70, show: false, calc: false },
+              { id: 5, text: 'lubang', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'ga liat', score: 100, show: false, calc: false },
+              { id: 2, text: 'ngantuk', score: 90, show: false, calc: false },
+              { id: 3, text: 'tergelincir', score: 80, show: false, calc: false },
+              { id: 4, text: 'kucing lewat', score: 70, show: false, calc: false },
+              { id: 5, text: 'lubang', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'stir', score: 100, show: false, calc: false },
+              { id: 2, text: 'kaca mata', score: 90, show: false, calc: false },
+              { id: 3, text: 'mobil', score: 80, show: false, calc: false },
+              { id: 4, text: 'surat-surat berkendara', score: 70, show: false, calc: false },
+              { id: 5, text: 'kunci', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'stir', score: 100, show: false, calc: false },
+              { id: 2, text: 'kaca mata', score: 90, show: false, calc: false },
+              { id: 3, text: 'mobil', score: 80, show: false, calc: false },
+              { id: 4, text: 'surat-surat berkendara', score: 70, show: false, calc: false },
+              { id: 5, text: 'kunci', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'tuang', score: 100, show: false, calc: false },
+              { id: 2, text: 'mata air', score: 90, show: false, calc: false },
+              { id: 3, text: 'sungai', score: 80, show: false, calc: false },
+              { id: 4, text: 'danau', score: 70, show: false, calc: false },
+              { id: 5, text: 'sumur', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'tuang', score: 100, show: false, calc: false },
+              { id: 2, text: 'mata air', score: 90, show: false, calc: false },
+              { id: 3, text: 'sungai', score: 80, show: false, calc: false },
+              { id: 4, text: 'danau', score: 70, show: false, calc: false },
+              { id: 5, text: 'sumur', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'pundak', score: 100, show: false, calc: false },
+              { id: 2, text: 'pelukan', score: 90, show: false, calc: false },
+              { id: 3, text: 'malam', score: 80, show: false, calc: false },
+              { id: 4, text: 'surga', score: 70, show: false, calc: false },
+              { id: 5, text: 'langit', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'pundak', score: 100, show: false, calc: false },
+              { id: 2, text: 'pelukan', score: 90, show: false, calc: false },
+              { id: 3, text: 'malam', score: 80, show: false, calc: false },
+              { id: 4, text: 'surga', score: 70, show: false, calc: false },
+              { id: 5, text: 'langit', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'sekali', score: 100, show: false, calc: false },
+              { id: 2, text: 'pencetan', score: 90, show: false, calc: false },
+              { id: 3, text: 'cetekan', score: 80, show: false, calc: false },
+              { id: 4, text: 'saklar', score: 70, show: false, calc: false },
+              { id: 5, text: 'tombol on', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'sekali', score: 100, show: false, calc: false },
+              { id: 2, text: 'pencetan', score: 90, show: false, calc: false },
+              { id: 3, text: 'cetekan', score: 80, show: false, calc: false },
+              { id: 4, text: 'saklar', score: 70, show: false, calc: false },
+              { id: 5, text: 'tombol on', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'tau waktu', score: 100, show: false, calc: false },
+              { id: 2, text: 'panik', score: 90, show: false, calc: false },
+              { id: 3, text: 'mencari anaknya', score: 80, show: false, calc: false },
+              { id: 4, text: 'khawatir', score: 70, show: false, calc: false },
+              { id: 5, text: 'marah', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'tau waktu', score: 100, show: false, calc: false },
+              { id: 2, text: 'panik', score: 90, show: false, calc: false },
+              { id: 3, text: 'mencari anaknya', score: 80, show: false, calc: false },
+              { id: 4, text: 'khawatir', score: 70, show: false, calc: false },
+              { id: 5, text: 'marah', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'semangat', score: 100, show: false, calc: false },
+              { id: 2, text: 'kantor', score: 90, show: false, calc: false },
+              { id: 3, text: 'perumahan', score: 80, show: false, calc: false },
+              { id: 4, text: 'pos', score: 70, show: false, calc: false },
+              { id: 5, text: 'keamanan', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'semangat', score: 100, show: false, calc: false },
+              { id: 2, text: 'kantor', score: 90, show: false, calc: false },
+              { id: 3, text: 'perumahan', score: 80, show: false, calc: false },
+              { id: 4, text: 'pos', score: 70, show: false, calc: false },
+              { id: 5, text: 'keamanan', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'mesan makanan', score: 100, show: false, calc: false },
+              { id: 2, text: 'saling berbicara', score: 90, show: false, calc: false },
+              { id: 3, text: 'serasi', score: 80, show: false, calc: false },
+              { id: 4, text: 'asyik', score: 70, show: false, calc: false },
+              { id: 5, text: 'mesra', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'mesan makanan', score: 100, show: false, calc: false },
+              { id: 2, text: 'saling berbicara', score: 90, show: false, calc: false },
+              { id: 3, text: 'serasi', score: 80, show: false, calc: false },
+              { id: 4, text: 'asyik', score: 70, show: false, calc: false },
+              { id: 5, text: 'mesra', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'sendiri', score: 100, show: false, calc: false },
+              { id: 2, text: 'ujian', score: 90, show: false, calc: false },
+              { id: 3, text: 'thesis', score: 80, show: false, calc: false },
+              { id: 4, text: 'tugas kuliah', score: 70, show: false, calc: false },
+              { id: 5, text: 'skripsi', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'sendiri', score: 100, show: false, calc: false },
+              { id: 2, text: 'ujian', score: 90, show: false, calc: false },
+              { id: 3, text: 'thesis', score: 80, show: false, calc: false },
+              { id: 4, text: 'tugas kuliah', score: 70, show: false, calc: false },
+              { id: 5, text: 'skripsi', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'libur', score: 100, show: false, calc: false },
+              { id: 2, text: 'suntikan', score: 90, show: false, calc: false },
+              { id: 3, text: 'obat', score: 80, show: false, calc: false },
+              { id: 4, text: 'infus', score: 70, show: false, calc: false },
+              { id: 5, text: 'perawatan', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'libur', score: 100, show: false, calc: false },
+              { id: 2, text: 'suntikan', score: 90, show: false, calc: false },
+              { id: 3, text: 'obat', score: 80, show: false, calc: false },
+              { id: 4, text: 'infus', score: 70, show: false, calc: false },
+              { id: 5, text: 'perawatan', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'berbeda-beda', score: 100, show: false, calc: false },
+              { id: 2, text: 'kotor', score: 90, show: false, calc: false },
+              { id: 3, text: 'hewan rumah', score: 80, show: false, calc: false },
+              { id: 4, text: 'menjijikan', score: 70, show: false, calc: false },
+              { id: 5, text: 'serangga', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'berbeda-beda', score: 100, show: false, calc: false },
+              { id: 2, text: 'kotor', score: 90, show: false, calc: false },
+              { id: 3, text: 'hewan rumah', score: 80, show: false, calc: false },
+              { id: 4, text: 'menjijikan', score: 70, show: false, calc: false },
+              { id: 5, text: 'serangga', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'terus', score: 100, show: false, calc: false },
+              { id: 2, text: 'singkat', score: 90, show: false, calc: false },
+              { id: 3, text: 'potong', score: 80, show: false, calc: false },
+              { id: 4, text: 'tembusan', score: 70, show: false, calc: false },
+              { id: 5, text: 'pintas', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'terus', score: 100, show: false, calc: false },
+              { id: 2, text: 'singkat', score: 90, show: false, calc: false },
+              { id: 3, text: 'potong', score: 80, show: false, calc: false },
+              { id: 4, text: 'tembusan', score: 70, show: false, calc: false },
+              { id: 5, text: 'pintas', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'lihat', score: 100, show: false, calc: false },
+              { id: 2, text: 'menjaga gawang', score: 90, show: false, calc: false },
+              { id: 3, text: 'ahli', score: 80, show: false, calc: false },
+              { id: 4, text: 'pemain sepak bola', score: 70, show: false, calc: false },
+              { id: 5, text: 'kiper', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'lihat', score: 100, show: false, calc: false },
+              { id: 2, text: 'menjaga gawang', score: 90, show: false, calc: false },
+              { id: 3, text: 'ahli', score: 80, show: false, calc: false },
+              { id: 4, text: 'pemain sepak bola', score: 70, show: false, calc: false },
+              { id: 5, text: 'kiper', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'di maki-maki', score: 100, show: false, calc: false },
+              { id: 2, text: 'gerah', score: 90, show: false, calc: false },
+              { id: 3, text: 'jalanan rame', score: 80, show: false, calc: false },
+              { id: 4, text: 'dahaga', score: 70, show: false, calc: false },
+              { id: 5, text: 'sinar matahari', score: 60, show: false, calc: false },
+            ],
+            team2: [
+              { id: 1, text: 'di maki-maki', score: 100, show: false, calc: false },
+              { id: 2, text: 'gerah', score: 90, show: false, calc: false },
+              { id: 3, text: 'jalanan rame', score: 80, show: false, calc: false },
+              { id: 4, text: 'dahaga', score: 70, show: false, calc: false },
+              { id: 5, text: 'sinar matahari', score: 60, show: false, calc: false },
+            ]
+          },{
+            team1: [
+              { id: 1, text: 'saldo', score: 100, show: false, calc: false },
+              { id: 2, text: 'mic', score: 90, show: false, calc: false },
+              { id: 3, text: 'keterampilan bernyanyi', score: 80, show: false, calc: false },
+              { id: 4, text: 'kesehatan', score: 70, show: false, calc: false },
+              { id: 5, text: 'suara', score: 60, show: false, calc: false }
+            ],
+            team2: [
+              { id: 1, text: 'saldo', score: 100, show: false, calc: false },
+              { id: 2, text: 'mic', score: 90, show: false, calc: false },
+              { id: 3, text: 'keterampilan bernyanyi', score: 80, show: false, calc: false },
+              { id: 4, text: 'kesehatan', score: 70, show: false, calc: false },
+              { id: 5, text: 'suara', score: 60, show: false, calc: false }
+            ]
+          }
+        ],
+        soal: [
+          {
+            team1: [],
+            team2: []
+          }
+        ],
+        score:{
+          team1: 0,
+          team2: 0,
+        },
+        /* teamnAswer:{
+          team1: [
+            { id: 1, text: 'Real-Time', score: '100', show:true },
+            { id: 2, text: 'Audience', score: '90', show:true },
+            { id: 3, text: 'Conversions', score: '80', show:true },
+          ],
+          team2: [
+            { id: 1, text: 'Real-Time', score: '100', show:true },
+            { id: 2, text: 'Audience', score: '90', show:true },
+            { id: 3, text: 'Conversions', score: '80', show:true },
+          ],
+        }, */
+      }),
+
+      computed: {
+        // ANCHOR computed
+        totalTeam1: function () {
+          let temp = 0
+          this.scorePerBabak.map(x => {
+            temp = temp + x.team1
+          });
+          return temp
+        },
+        totalTeam2: function () {
+          let temp = 0
+          this.scorePerBabak.map(x => {
+            temp = temp + x.team2
+          });
+          return temp
+        },
+        /* compScorePerBabak: function () {
+          if (this.scorePerBabak[0].team1 > 0) {
+            return true
+          } else {
+            return false
+          }
+          // return {
+          //   active: this.isActive && !this.error,
+          //   'red accent-4': item.style
+          // }
+        } */
+      },
+
+      watch: {
+        // ANCHOR watch
+
+      },
+
+      methods: {
+        // ANCHOR Methods
+        changeSoal: function (val) {
+          // console.log("changeSoal");
+          // console.log(val);
+
+          this.modeGantiSoal = val
+
+          this.soalFalse[0]["team1"] = []
+          this.soalFalse[0]["team2"] = []
+          this.soal[0] = this.bankSoal[val]
+
+          // console.log(this.score);
+          
+          this.score.team1 = 0
+          this.score.team2 = 0
+
+          /* console.log(this.bankSoal);
+          console.log(this.soal);
+          console.log("---"); */
+          
+        }, 
+        /* modeGantiSoal: function (val) {
+          console.log("mode ganti soal" + val);
+          this.soal = []
+          this.soalFalse[0]["team1"] = []
+          this.soalFalse[0]["team2"] = []
+          this.soal.push(this.bankSoal[val])
+
+          // this.score.team1 = 0
+          // this.score.team2 = 0
+
+          // console.log(this.score);
+          
+        }, */
+        saveScore () {
+          // localStorage.setItem(this.modeGantiSoal, JSON.stringify(this.score));
+
+          let tempScore = this.score
+          let tempNo = this.modeGantiSoal
+          
+          // tempScore.babak = `Babak ${parseInt(this.modeGantiSoal) + 1}`
+          // let obj = Object.assign(tempScore, {babak: `Babak ${parseInt(this.modeGantiSoal) + 1}`})
+          // console.log(this.score);
+          // console.log(obj);
+          this.scorePerBabak[tempNo]['team1'] = tempScore['team1']
+          this.scorePerBabak[tempNo]['team2'] = tempScore['team2']
+          // console.table(this.scorePerBabak);
+          
+        },
+        showAnswer (item, i) {
+          this.soal[0].team1[i].show = true
+          this.soal[0].team2[i].show = true
+        },
+        submitAnswer () {
+          // this.saveScore()
+          if (this.modeGantiSoal == -1) {
+            alert("Soal nya belum dipilih mbang!")
+          } else {
+            if (this.turn == "team1") {
+              this.checkVisibility("team1", "team2", this.answer)
+              
+              /* if (this.modeSapuBersih) {
+                this.score.team1 = this.countScore(this.soal[0]["team1"]) + this.countScore(this.soal[0]["team2"])
+                this.score.team2 = 0
+              } else {
+                this.score.team1 = this.countScore(this.soal[0]["team1"])
+              } */
+            } else if (this.turn == "team2") {
+              this.checkVisibility("team2", "team1", this.answer)
+
+              /* if (this.modeSapuBersih) {
+                this.score.team2 = this.countScore(this.soal[0]["team1"]) + this.countScore(this.soal[0]["team2"])
+                this.score.team1 = 0
+              } else {
+                this.score.team2 = this.countScore(this.soal[0]["team2"])
+              } */
+            } else {
+              alert("pilih dulu tim nya mbang!")
+            }
+          }
+          this.answer = ""
+        },
+        countScore (arr) {
+          let score = 0
+          // let temp = this.soal[0][turn]
+          
+          arr.map(x => {
+            if (x.calc) {
+              // score += x.score
+              score = score + x.score
+            }
+          });
+          
+          // temp.forEach(element => {
+          //   if (element.calc) {
+          //     console.log("element");
+          //     console.log(element);
+              
+          //     score = element.score + score
+          //   }
+          // });
+
+          return score
+        },
+        pushAnswer (turn, answer) {
+          let obj = Object.assign({score: ""}, {text: answer, show:true, calc:false})
+          this.soalFalse[0][turn].push(obj)
+        },
+        checkVisibility (turn, notTurn, answer) {
+          let counter = 0
+          let tempSoal = this.soal[0][turn]
+          tempSoal.map(x => {
+            
+            if (x.text == answer) {
+              x.show = true
+              x.calc = true
+            }
+            else {
+              counter++
+            }
+          });
+
+          if (counter == this.soal[0][turn].length) {
+            console.log("push"); // jawaban salah
+
+            this.pushAnswer(turn, answer)
+
+            let sound = new Howl({
+              src: ['x.mp3']
+            });
+            sound.play();
+          } else {
+            console.log("not push"); // jawaban benar
+
+            if (this.modeSapuBersih) {
+              this.score[turn] = this.countScore(this.soal[0]["team1"]) + this.countScore(this.soal[0]["team2"])
+              this.score[notTurn] = 0
+            } else {
+              this.score[turn] = this.countScore(this.soal[0]["team1"])
+            }
+
+            let sound = new Howl({
+              src: ['v.mp3']
+            });
+
+            sound.play();
+          }
+        }
+      }
+
+    })
+  </script>
+  
+</body>
+</html>
